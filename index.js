@@ -8,6 +8,57 @@
  As a result, the lessons for this function will pass *and* it will be available
  for you to use if you need it!
  */
+const createEmployeeRecord = employee => {
+  const [firstName, familyName, title, payPerHour ] = employee;
+  return {
+    firstName,
+    familyName,
+    title,
+    payPerHour,
+    timeInEvents: [],
+    timeOutEvents: []
+  }
+}
+const createEmployeeRecords = employees => {
+  return employees.map(e => {
+    return createEmployeeRecord(e);
+  });
+}
+let createTimeInEvent = function(dateStamp){
+  let [date, hour] = dateStamp.split(' ')
+
+  this.timeInEvents.push({
+      type: "TimeIn",
+      hour: parseInt(hour, 10),
+      date,
+  })
+
+  return this
+}
+
+let createTimeOutEvent = function(dateStamp){
+  let [date, hour] = dateStamp.split(' ')
+
+  this.timeOutEvents.push({
+      type: "TimeOut",
+      hour: parseInt(hour, 10),
+      date,
+  })
+
+  return this
+}
+let hoursWorkedOnDate = function(date) {
+  let timesIn = this.timeInEvents.find(e => {
+    return e.date === date;
+  })
+  let timesOut = this.timeOutEvents.find(e => {
+    return e.date === date;
+  })
+  return (timesOut.hour - timesIn.hour) / 100
+}
+let wagesEarnedOnDate = function(date) {
+  return hoursWorkedOnDate.call(this, date) * this.payPerHour;
+}
 
 let allWagesFor = function () {
     let eligibleDates = this.timeInEvents.map(function (e) {
@@ -19,4 +70,16 @@ let allWagesFor = function () {
     }.bind(this), 0) // <== Hm, why did we need to add bind() there? We'll discuss soon!
 
     return payable
+}
+
+let findEmployeeByFirstName = function(srcArray, firstName) {
+  return srcArray.find(function(rec){
+    return rec.firstName === firstName
+  })
+}
+
+let calculatePayroll = function(arrayOfEmployeeRecords){
+    return arrayOfEmployeeRecords.reduce(function(memo, rec){
+        return memo + allWagesFor.call(rec)
+    }, 0)
 }
